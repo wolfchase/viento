@@ -18,7 +18,17 @@ namespace Viento {
 		int start(void);
 
 	private:
+	
+#if defined(_WIN32) || defined(_WIN64)
+
 		std::map<int, SOCKET> m_sockets;
+
+#else
+
+		std::map<int, int> m_sockets;
+		
+#endif
+
 		int m_sock_id;
 
 		int socket_listen(void);

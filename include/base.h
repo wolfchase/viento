@@ -21,6 +21,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <unistd.h>
+#include <cstring>
 
 #define UNIX 1
 #define WINDOWS 0

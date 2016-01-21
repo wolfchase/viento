@@ -6,6 +6,7 @@ using namespace Viento;
 Base::Base()
 {
 #if defined(_WIN32) || defined(_WIN64)
+
 	WSADATA wsaData;
 
 	m_status = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -16,11 +17,16 @@ Base::Base()
 	}
 	else
 		m_init = INIT_SUCCESS;
-#elif __unix || __unix__ || __linux__
+		
+#elif defined(__unix) || defined(__unix__) || defined(__linux__)
+
 	m_init = INIT_SUCCESS;
+	
 #else
+
 	std::cerr << "Your operating system is currently not supported" << std::endl;
 	m_init = INIT_FAILURE;
+	
 #endif
 }
 
@@ -38,7 +44,7 @@ int Base::socket_init(void)
 
 	char yes = 1;
 
-	memset(&hints, 0, sizeof hints);
+    std::memset(&hints, 0, sizeof hints);
 
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
@@ -49,7 +55,9 @@ int Base::socket_init(void)
 
 	if (m_status != 0) {
 		std::cerr << "getaddrinfo failed: %i" << m_status << std::endl;
+#if defined(_WIN32) || defined(_WIN64)
 		if (WINDOWS) WSACleanup();
+#endif
 		return 1;
 	}
 
@@ -76,7 +84,7 @@ int Base::socket_init(void)
 #if defined(_WIN32) || defined(_WIN64)
 			closesocket(m_socket);
 #else
-			close(m_socket)
+			close(m_socket);
 #endif
 			continue;
 		}

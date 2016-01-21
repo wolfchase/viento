@@ -16,3 +16,6 @@ src/cmake_install.cmake
 src/viento.dir/
 src/viento.vcxproj
 src/viento.vcxproj.filters
+Makefile
+src/Makefile
+viento

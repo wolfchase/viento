@@ -1,3 +1,8 @@
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <netdb.h>
+
 #include "server.h"
 
 using namespace Viento;
@@ -37,14 +42,23 @@ int Server::socket_accept(void)
 		while (true) {
 			auto client_socket = accept(m_socket, NULL, NULL);
 
-			if (client_socket == INVALID_SOCKET) {
+			if (client_socket == m_SOCK_ERROR) {
+#if defined(_WIN32) || defined(_WIN64)
 				std::cerr << "Accept failed: " << WSAGetLastError() << std::endl;
 				closesocket(m_socket);
 				WSACleanup();
+#else
+				std::cerr << "Accept failed" << std::endl;
+				close(m_socket);
+#endif
 				return 1;
 			}
 
+#if defined(_WIN32) || defined(_WIN64)
 			m_sockets.insert(std::pair<int, SOCKET>(++m_sock_id, client_socket));
+#else
+			m_sockets.insert(std::pair<int, int>(++m_sock_id, client_socket));
+#endif
 		}
 	});
 
