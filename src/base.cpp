@@ -1,9 +1,9 @@
-#include "viento.h"
+#include "base.h"
+
+using namespace Viento;
 
 // Constructor
-Viento::Viento(const int vt)
-	: m_sock_id(0)
-	, m_viento_type(vt)
+Base::Base()
 {
 #if defined(_WIN32) || defined(_WIN64)
 	WSADATA wsaData;
@@ -26,12 +26,12 @@ Viento::Viento(const int vt)
 
 /* Public Member Functions */
 
-int Viento::initialized(void) 
+int Base::initialized(void)
 {
 	return m_init;
 }
 
-int Viento::socket_init(void)
+int Base::socket_init(void)
 {
 	struct addrinfo hints;
 	struct addrinfo *servinfo, *res;
@@ -101,41 +101,3 @@ int Viento::socket_init(void)
 }
 
 /* Private Member Functions */
-
-int Viento::socket_listen(void)
-{
-	if (listen(m_socket, SOMAXCONN) == -1) {
-#if defined(_WIN32) || defined(_WIN64)
-		std::cerr << "Listen failed with error: " << WSAGetLastError() << std::endl;
-		closesocket(m_socket);
-		WSACleanup();
-		return 1;
-#else
-		std::cerr << "Listen failed for socket" << std::endl;
-		close(m_socket);
-		return 1;
-#endif
-	}
-
-	return 0;
-}
-
-int Viento::socket_accept(void)
-{
-	std::thread([&]() {
-		while (true) {
-			auto client_socket = accept(m_socket, NULL, NULL);
-
-			if (client_socket == INVALID_SOCKET) {
-				std::cerr << "Accept failed: " << WSAGetLastError() << std::endl;
-				closesocket(m_socket);
-				WSACleanup();
-				return 1;
-			}
-
-			m_sockets.insert(std::pair<int, SOCKET>(++m_sock_id, client_socket));
-		}
-	});
-
-	return 0;
-}

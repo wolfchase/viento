@@ -1,5 +1,6 @@
-add_executable(viento main.cpp viento.cpp
-                      ${VIENTO_DIRECTORY}/include/viento.h)
+add_executable(viento main.cpp base.cpp
+                      ${VIENTO_DIRECTORY}/include/viento.h 
+					  ${VIENTO_DIRECTORY}/include/base.h)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     set_target_properties( viento PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${VIENTO_DIRECTORY}/bin/win32/debug )

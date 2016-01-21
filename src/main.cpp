@@ -2,10 +2,10 @@
 #include <iostream>
 
 // Local libraries
-#include "viento.h"
+#include "server.h"
 
 int main(void) {
-	Viento server = Viento(Viento::server);
+	Viento::Server server = Viento::Server();
 
 	if (server.initialized()) {
 		std::cout << "Server successfully initialized" << std::endl;
