@@ -55,11 +55,10 @@ namespace Viento {
 
 	class Base {
 	public:
-		Base();
+		Base(void);
 
 		int initialized(void);
 		int socket_init(void);
-		//int start(void);
 
 	protected:
 		int status;      // Used to set errors
