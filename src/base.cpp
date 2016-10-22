@@ -22,11 +22,6 @@ Base::Base()
 
 	m_init = INIT_SUCCESS;
 	
-#else
-
-	std::cerr << "Your operating system is currently not supported" << std::endl;
-	m_init = INIT_FAILURE;
-	
 #endif
 }
 
