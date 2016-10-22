@@ -25,10 +25,10 @@ int Server::socket_listen(void)
 	if (listen(this->v_socket, SOMAXCONN) == -1) {
 		WSA_CLEANUP();
 		CLOSE_SOCKET(this->v_socket);
-		return 1;
+		return -1;
 	}
 
-	return 0;
+	return 1;
 }
 
 int Server::socket_accept(void)
@@ -40,12 +40,27 @@ int Server::socket_accept(void)
 			if (client_socket == SOCK_ERROR) {
 				WSA_CLEANUP();
 				CLOSE_SOCKET(this->v_socket);
-				return 1;
+				return -1;
 			}
 
 			this->sockets.insert(std::pair<int, SOCKET>(++this->sock_id, client_socket));
 		}
 	});
+
+	return 1;
+}
+
+int Server::start(void)
+{
+	if (!this->socket_listen()) {
+		std::cout << "Socket failed to listen" << std::endl;
+		return -1;
+	}
+
+	if (!this->socket_accept()) {
+		std::cout << "Socket failed to start accepting" << std::endl;
+		return -1;
+	}
 
 	return 0;
 }
