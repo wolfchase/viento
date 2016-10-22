@@ -1,7 +1,9 @@
+#ifdef VIENTO_UNIX
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <netdb.h>
+#endif
 
 #include "server.h"
 
@@ -11,7 +13,7 @@ using namespace Viento;
 
 Server::Server()
 	: Base()
-	, m_sock_id(0)
+	, sock_id(0)
 {
 
 }
@@ -20,10 +22,10 @@ Server::Server()
 
 int Server::socket_listen(void)
 {
-	if (listen(m_socket, SOMAXCONN) == -1) {
+	if (listen(this->v_socket, SOMAXCONN) == -1) {
 #if defined(_WIN32) || defined(_WIN64)
 		std::cerr << "Listen failed with error: " << WSAGetLastError() << std::endl;
-		closesocket(m_socket);
+		closesocket(this->v_socket);
 		WSACleanup();
 		return 1;
 #else
@@ -40,12 +42,12 @@ int Server::socket_accept(void)
 {
 	std::thread([&]() {
 		while (true) {
-			auto client_socket = accept(m_socket, NULL, NULL);
+			auto client_socket = accept(this->v_socket, NULL, NULL);
 
-			if (client_socket == m_SOCK_ERROR) {
+			if (client_socket == SOCK_ERROR) {
 #if defined(_WIN32) || defined(_WIN64)
 				std::cerr << "Accept failed: " << WSAGetLastError() << std::endl;
-				closesocket(m_socket);
+				closesocket(this->v_socket);
 				WSACleanup();
 #else
 				std::cerr << "Accept failed" << std::endl;
@@ -55,7 +57,7 @@ int Server::socket_accept(void)
 			}
 
 #if defined(_WIN32) || defined(_WIN64)
-			m_sockets.insert(std::pair<int, SOCKET>(++m_sock_id, client_socket));
+			sockets.insert(std::pair<int, SOCKET>(++sock_id, client_socket));
 #else
 			m_sockets.insert(std::pair<int, int>(++m_sock_id, client_socket));
 #endif

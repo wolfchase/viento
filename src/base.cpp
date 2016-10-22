@@ -9,14 +9,14 @@ Base::Base()
 
 	WSADATA wsaData;
 
-	m_status = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	status = WSAStartup(MAKEWORD(2, 2), &wsaData);
 
-	if (m_status != 0) {
-		std::cout << "WSAStartup failed: " << m_status << std::endl;
-		m_init = INIT_FAILURE;
+	if (status != 0) {
+		std::cout << "WSAStartup failed: " << status << std::endl;
+		init = INIT_FAILURE;
 	}
 	else
-		m_init = INIT_SUCCESS;
+		init = INIT_SUCCESS;
 		
 #elif defined(__unix) || defined(__unix__) || defined(__linux__)
 
@@ -34,7 +34,7 @@ Base::Base()
 
 int Base::initialized(void)
 {
-	return m_init;
+	return this->init;
 }
 
 int Base::socket_init(void)
@@ -51,38 +51,38 @@ int Base::socket_init(void)
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_flags = AI_PASSIVE;
 
-	m_status = getaddrinfo(NULL, DEFAULT_PORT, &hints, &servinfo);
+	this->status = getaddrinfo(NULL, VIENTO_DEFAULT_PORT, &hints, &servinfo);
 
-	if (m_status != 0) {
-		std::cerr << "getaddrinfo failed: %i" << m_status << std::endl;
-#if defined(_WIN32) || defined(_WIN64)
-		if (WINDOWS) WSACleanup();
+	if (status != 0) {
+		std::cerr << "getaddrinfo failed: %i" << status << std::endl;
+#ifdef VIENTO_WIN
+		WSACleanup();
 #endif
 		return 1;
 	}
 
 	for (res = servinfo; res != NULL; res = res->ai_next) {
-		if ((m_socket = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1) {
+		if ((this->v_socket = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1) {
 			std::cerr << "NOT FATAL: server (socket)" << std::endl;
 			continue;
 		}
 
-		if (setsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
+		if (setsockopt(this->v_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
 			std::cerr << "server (setsockopt)" << std::endl;
 			freeaddrinfo(servinfo);
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef VIENTO_WIN
 			WSACleanup();
-			closesocket(m_socket);
+			closesocket(this->v_socket);
 #else
 			close(m_socket);
 #endif
 			return 1;
 		}
 
-		if (bind(m_socket, res->ai_addr, (int) res->ai_addrlen) == m_SOCK_ERROR) {
+		if (bind(this->v_socket, res->ai_addr, (int) res->ai_addrlen) == SOCK_ERROR) {
 			std::cerr << "NOT FATAL: server (bind)" << std::endl;
-#if defined(_WIN32) || defined(_WIN64)
-			closesocket(m_socket);
+#ifdef VIENTO_WIN
+			closesocket(this->v_socket);
 #else
 			close(m_socket);
 #endif
@@ -96,9 +96,9 @@ int Base::socket_init(void)
 
 	if (res == NULL) {
 		std::cerr << "Could not create socket" << std::endl;
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef VIENTO_WIN
 		WSACleanup();
-		closesocket(m_socket);
+		closesocket(this->v_socket);
 #else
 		close(m_socket);
 #endif

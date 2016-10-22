@@ -15,7 +15,7 @@ int main(void) {
 		return 1;
 	}
 
-	if (server.socket_init() != 1) {
+	if (server.socket_init() != Viento::INIT_FAILURE) {
 		std::cout << "Socket initialized" << std::endl;
 	}
 	else {

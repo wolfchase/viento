@@ -10,9 +10,10 @@
 #include <winsock2.h>
 #include <WS2tcpip.h>
 #include <stdio.h>
+#include <string>
 
-#define WINDOWS 1
-#define UNIX 0
+#define VIENTO_WIN
+#define SOCKET SOCKET
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -24,20 +25,20 @@
 #include <unistd.h>
 #include <cstring>
 
-#define UNIX 1
-#define WINDOWS 0
+#define VIENTO_UNIX
+#define SOCKET int
 
 #endif
 
-#define INIT_FAILURE 0
-#define INIT_SUCCESS 1
-
-#define DEFAULT_PORT "27015"
+#define VIENTO_DEFAULT_PORT "27105"
 
 namespace Viento {
+	const int CLIENT = 0;
+	const int SERVER = 1;
+	const int INIT_FAILURE = 0;
+	const int INIT_SUCCESS = 1;
 
-	class Base
-	{
+	class Base {
 	public:
 		Base();
 
@@ -45,23 +46,13 @@ namespace Viento {
 		int socket_init(void);
 		//int start(void);
 
-		static const int client = 0;
-		static const int server = 1;
-
 	protected:
-		int m_status; // Used to set errors
-		int m_init; // Used to indicate instantiation success/failure
-		int m_viento_type; // Used to indicate client or server setup
+		int status;      // Used to set errors
+		int init;        // Used to indicate instantiation success/failure
+		int viento_type; // Used to indicate client or server setup
 
-						   // Socket information, won't need too much
-						   // fiddling after socket initialization
-#if defined(_WIN32) || defined(_WIN64)
-		SOCKET m_socket;
-		const int m_SOCK_ERROR = SOCKET_ERROR;
-#else
-		int m_socket;
-		const int m_SOCK_ERROR = -1;
-#endif
+		SOCKET v_socket;
+		const int SOCK_ERROR = SOCKET_ERROR;
 	};
 }
 

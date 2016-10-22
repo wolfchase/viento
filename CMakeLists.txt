@@ -42,14 +42,3 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR
     set_property(TARGET viento PROPERTY CXX_STANDARD 14)
     set_property(TARGET viento PROPERTY CXX_STANDARD_REQUIRED ON)
 endif()
-
-# Messy options for bin output for VS, clean up later
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    set_target_properties( viento PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${VIENTO_DIRECTORY}/bin/win32/debug )
-    set_target_properties( viento PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${VIENTO_DIRECTORY}/bin/win32/release )
-    set_target_properties( viento PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${VIENTO_DIRECTORY}/bin/win32 )
-    set_target_properties( viento PROPERTIES LIBRARY_OUTPUT_DIRECTORY_DEBUG ${VIENTO_DIRECTORY}/bin/win32/debug )
-    set_target_properties( viento PROPERTIES LIBRARY_OUTPUT_DIRECTORY_RELEASE ${VIENTO_DIRECTORY}/bin/win32/release )
-	set( EXECUTABLE_OUTPUT_PATH "../" )
-	SET_TARGET_PROPERTIES( viento  PROPERTIES PREFIX "../")
-endif()
