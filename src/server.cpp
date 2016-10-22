@@ -23,16 +23,9 @@ Server::Server()
 int Server::socket_listen(void)
 {
 	if (listen(this->v_socket, SOMAXCONN) == -1) {
-#if defined(_WIN32) || defined(_WIN64)
-		std::cerr << "Listen failed with error: " << WSAGetLastError() << std::endl;
-		closesocket(this->v_socket);
-		WSACleanup();
+		WSA_CLEANUP();
+		CLOSE_SOCKET(this->v_socket);
 		return 1;
-#else
-		std::cerr << "Listen failed for socket" << std::endl;
-		close(m_socket);
-		return 1;
-#endif
 	}
 
 	return 0;
@@ -45,22 +38,12 @@ int Server::socket_accept(void)
 			auto client_socket = accept(this->v_socket, NULL, NULL);
 
 			if (client_socket == SOCK_ERROR) {
-#if defined(_WIN32) || defined(_WIN64)
-				std::cerr << "Accept failed: " << WSAGetLastError() << std::endl;
-				closesocket(this->v_socket);
-				WSACleanup();
-#else
-				std::cerr << "Accept failed" << std::endl;
-				close(m_socket);
-#endif
+				WSA_CLEANUP();
+				CLOSE_SOCKET(this->v_socket);
 				return 1;
 			}
 
-#if defined(_WIN32) || defined(_WIN64)
-			sockets.insert(std::pair<int, SOCKET>(++sock_id, client_socket));
-#else
-			m_sockets.insert(std::pair<int, int>(++m_sock_id, client_socket));
-#endif
+			this->sockets.insert(std::pair<int, SOCKET>(++this->sock_id, client_socket));
 		}
 	});
 

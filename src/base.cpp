@@ -5,8 +5,7 @@ using namespace Viento;
 // Constructor
 Base::Base()
 {
-#if defined(_WIN32) || defined(_WIN64)
-
+#ifdef VIENTO_WIN
 	WSADATA wsaData;
 
 	status = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -15,13 +14,11 @@ Base::Base()
 		std::cout << "WSAStartup failed: " << status << std::endl;
 		init = INIT_FAILURE;
 	}
-	else
+	else {
 		init = INIT_SUCCESS;
-		
-#elif defined(__unix) || defined(__unix__) || defined(__linux__)
-
+	}
+#else
 	m_init = INIT_SUCCESS;
-	
 #endif
 }
 
@@ -50,9 +47,7 @@ int Base::socket_init(void)
 
 	if (status != 0) {
 		std::cerr << "getaddrinfo failed: %i" << status << std::endl;
-#ifdef VIENTO_WIN
-		WSACleanup();
-#endif
+		WSA_CLEANUP();
 		return 1;
 	}
 
@@ -65,22 +60,14 @@ int Base::socket_init(void)
 		if (setsockopt(this->v_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
 			std::cerr << "server (setsockopt)" << std::endl;
 			freeaddrinfo(servinfo);
-#ifdef VIENTO_WIN
-			WSACleanup();
-			closesocket(this->v_socket);
-#else
-			close(m_socket);
-#endif
+			WSA_CLEANUP();
+			CLOSE_SOCKET(this->v_socket);
 			return 1;
 		}
 
 		if (bind(this->v_socket, res->ai_addr, (int) res->ai_addrlen) == SOCK_ERROR) {
 			std::cerr << "NOT FATAL: server (bind)" << std::endl;
-#ifdef VIENTO_WIN
-			closesocket(this->v_socket);
-#else
-			close(m_socket);
-#endif
+			CLOSE_SOCKET(this->v_socket);
 			continue;
 		}
 
@@ -91,12 +78,8 @@ int Base::socket_init(void)
 
 	if (res == NULL) {
 		std::cerr << "Could not create socket" << std::endl;
-#ifdef VIENTO_WIN
-		WSACleanup();
-		closesocket(this->v_socket);
-#else
-		close(m_socket);
-#endif
+		WSA_CLEANUP();
+		CLOSE_SOCKET(this->v_socket);
 		return 1;
 	}
 

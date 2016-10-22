@@ -14,6 +14,16 @@
 
 #define VIENTO_WIN
 #define SOCKET SOCKET
+#define WSA_CLEANUP() \
+ ( \
+  (WSACleanup()), \
+  (void)0 \
+ )
+#define CLOSE_SOCKET(SOCK) \
+ ( \
+  (closesocket((SOCK))), \
+  (void)0 \
+ )
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -27,6 +37,11 @@
 
 #define VIENTO_UNIX
 #define SOCKET int
+#define WSA_CLEANUP()
+#define CLOSE_SOCKET(SOCK) \
+ ( \
+  (close((SOCK))), \
+ )
 
 #endif
 
